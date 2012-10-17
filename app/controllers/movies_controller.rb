@@ -7,9 +7,12 @@ class MoviesController < ApplicationController
   end
 
   def index
+    @all_ratings=Movie.all_ratings
+    @rating_select = params[:ratings]
     if params.include?(:sortby)
       @sortby = params[:sortby]
-      @movies = Movie.find(:all,:order => @sortby)
+      @movies = Movie.find_all_by_rating(rating_select.keys, :order => @sortby)
+ #      @movies = Movie.find(:all,:order => @sortby)
     else
       @movies = Movie.all
     end
