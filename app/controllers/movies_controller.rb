@@ -8,6 +8,7 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings=Movie.all_ratings
+    #debugger
     if !params.include?(:ratings) or !params.include?(:sortby)  # if missing info from user, fill from session
       if !params.include?(:ratings)
         @ratings_selected = session.include?(:ratings)?session[:ratings]:{'G'=>'1','PG'=>'1','PG-13'=>'1','R'=>'1', 'NC-17'=>'1'}
@@ -15,7 +16,7 @@ class MoviesController < ApplicationController
         @ratings_selected = params[:ratings]
       end
       if !params.include?(:sortby)
-        @sortby = session.include?(:sortby)?session[:sortby]:"title"
+        @sortby = session.include?(:sortby)?session[:sortby]:"none"
       else
         @sortby = params[:sortby]
       end
@@ -23,6 +24,12 @@ class MoviesController < ApplicationController
       session[:sortby] = @sortby
       flash.keep
       redirect_to movies_path(:sortby => @sortby, :ratings => @ratings_selected)      
+    end
+    if params[:ratings]!=session[:ratings]
+      session[:ratings]=params[:ratings]
+    end
+    if params[:sortby]!=session[:sortby]
+      session[:sortby]=params[:sortby]
     end
 #    @all_ratings=['G','PG','PG-13','R', 'NC-17']
     # if session.include?(:ratings)
@@ -39,14 +46,22 @@ class MoviesController < ApplicationController
       @ratings_selected = params[:ratings]
       @sortby = params[:sortby]
 #      @movies = Movie.where(:rating => @ratings_selected.keys).order(@sortby)
-      @movies = Movie.find(:all, :conditions => { :rating => @ratings_selected.keys}, :order => @sortby)
+      if params[:sortby]=="none"
+        @movies = Movie.find(:all, :conditions => { :rating => @ratings_selected.keys})
+      else
+        @movies = Movie.find(:all, :conditions => { :rating => @ratings_selected.keys}, :order => @sortby)
+      end
     elsif params.include?(:ratings)
       @ratings_selected = params[:ratings]
       @movies = Movie.find(:all, :conditions => { :rating => @ratings_selected.keys})
 #      @movies = Movie.find(:all, :rating => @ratings_selected.keys)
     elsif params.include?(:sortby)
       @sortby = params[:sortby]
-      @movies = Movie.find(:all, :order => @sortby)
+      if params[:sortby]=="none"
+        @movies = Movie.all
+      else
+        @movies = Movie.find(:all, :order => @sortby)
+      end
     else
       @movies = Movie.all
     end
