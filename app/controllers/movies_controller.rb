@@ -9,6 +9,7 @@ class MoviesController < ApplicationController
   def index
     @all_ratings=Movie.all_ratings
 #    @all_ratings=['G','PG','PG-13','R', 'NC-17']
+    @ratings_selected={'G'=>'1','PG'=>'1','PG-13'=>'1','R'=>'1', 'NC-17'=>'1'}
     if params.include?(:ratings) and params.include?(:sortby)
       @ratings_selected = params[:ratings]
       @sortby = params[:sortby]
