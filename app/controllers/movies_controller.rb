@@ -8,8 +8,32 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings=Movie.all_ratings
+    if !params.include?(:ratings) or !params.include?(:sortby)  # if missing info from user, fill from session
+      if !params.include?(:ratings)
+        @ratings_selected = session.include?(:ratings)?session[:ratings]:{'G'=>'1','PG'=>'1','PG-13'=>'1','R'=>'1', 'NC-17'=>'1'}
+      else
+        @ratings_selected = params[:ratings]
+      end
+      if !params.include?(:sortby)
+        @sortby = session.include?(:sortby)?session[:sortby]:"title"
+      else
+        @sortby = params[:sortby]
+      end
+      session = {:ratings=>@ratings_selected, :sortby=@sortby}
+      flash.keep
+      redirect_to movies_path(:sortby => @sortby, :ratings => @ratings_selected)      
+    end
 #    @all_ratings=['G','PG','PG-13','R', 'NC-17']
-    @ratings_selected={'G'=>'1','PG'=>'1','PG-13'=>'1','R'=>'1', 'NC-17'=>'1'}
+    # if session.include?(:ratings)
+      # @ratings_selected = session[:ratings]
+    # else
+      # @ratings_selected = {'G'=>'1','PG'=>'1','PG-13'=>'1','R'=>'1', 'NC-17'=>'1'}
+    # end
+#     
+    # if session.include?(:sortby)
+      # @sortby = session[:sortby]
+    # end
+#     
     if params.include?(:ratings) and params.include?(:sortby)
       @ratings_selected = params[:ratings]
       @sortby = params[:sortby]
